@@ -25,12 +25,14 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Install Java SDK 11
-      run: choco install openjdk11
+      run: |
+        choco install openjdk11
+        refreshenv
 
     - name: Set up Java SDK 11
       run: |
-        echo "JAVA_HOME=C:\Program Files\OpenJDK\openjdk-11.0.2" >> $Env:GITHUB_ENV
-        echo "PATH=$JAVA_HOME\bin:$PATH" >> $Env:GITHUB_ENV
+        echo "JAVA_HOME=C:\\Program Files\\OpenJDK\\openjdk-11.0.2" >> $Env:GITHUB_ENV
+        echo "PATH=C:\\Program Files\\OpenJDK\\openjdk-11.0.2\\bin;$PATH" >> $Env:GITHUB_ENV
 
     - name: Verify Java SDK Installation
       run: |
@@ -40,10 +42,10 @@ jobs:
     - name: Build Xamarin Android APK
       shell: pwsh
       run: |
-        $vsPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
-        $msbuildPath = "$vsPath\MSBuild\Current\Bin\MSBuild.exe"
+        $vsPath = & "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+        $msbuildPath = "$vsPath\\MSBuild\\Current\\Bin\\MSBuild.exe"
         & $msbuildPath Ble.Client/Ble.Client.sln /t:Restore /p:Configuration=Release
-        & $msbuildPath Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj /t:PackageForAndroid /p:Configuration=Release /p:JavaSdkDirectory="C:\Program Files\OpenJDK\openjdk-11.0.2"
+        & $msbuildPath Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj /t:PackageForAndroid /p:Configuration=Release /p:JavaSdkDirectory="C:\\Program Files\\OpenJDK\\openjdk-11.0.2"
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
