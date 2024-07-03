@@ -54,15 +54,19 @@ jobs:
         & $msbuildPath Ble.Client/Ble.Client.sln /t:Restore /p:Configuration=Release
         & $msbuildPath Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj /t:PackageForAndroid /p:Configuration=Release /p:JavaSdkDirectory="C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot"
 
-    - name: Generate Keystore and Sign APK
+    - name: Generate Keystore
       run: |
-        $keystoreFile = "my-release-key.jks"
+        $keystoreFile = "my-release-key.keystore"
         $keystorePassword = "password"
         $keyAlias = "my-key-alias"
         $keyPassword = "password"
         & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\keytool.exe" -genkeypair -v -keystore $keystoreFile -storepass $keystorePassword -keypass $keyPassword -alias $keyAlias -dname "CN=Example, OU=Example, O=Example, L=City, ST=State, C=US" -keyalg RSA -keysize 2048 -validity 10000
+
+    - name: Sign APK
+      run: |
         $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
-        & "C:\\Android\\android-sdk\\build-tools\\30.0.3\\apksigner.bat" sign --ks $keystoreFile --ks-pass pass:$keystorePassword --key-pass pass:$keyPassword --out $apkPath-signed.apk $apkPath
+        & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\jarsigner.exe" -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore -storepass password -keypass password $apkPath my-key-alias
+        & "C:\\Android\\android-sdk\\build-tools\\30.0.3\\zipalign.exe" -v 4 $apkPath $apkPath-signed.apk
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
