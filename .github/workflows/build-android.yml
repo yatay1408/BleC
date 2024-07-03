@@ -79,6 +79,11 @@ jobs:
         & $Env:zipalign -v 4 $apkPath $apkPath-aligned.apk
         Move-Item -Path $apkPath-aligned.apk -Destination $apkPath -Force
 
+    - name: Verify APK
+      run: |
+        $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
+        & "C:\\Android\\android-sdk\\build-tools\\30.0.3\\apksigner.bat" verify $apkPath
+
     - name: Publish APK
       uses: actions/upload-artifact@v2
       with:
