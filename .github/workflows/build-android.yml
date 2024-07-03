@@ -41,9 +41,9 @@ jobs:
         echo "PATH=$PATH:$HOME/Android/Sdk/platform-tools" >> $GITHUB_ENV
         echo "PATH=$PATH:$HOME/Android/Sdk/cmdline-tools/latest/bin" >> $GITHUB_ENV
 
-    - name: Install Xamarin.Android workload
+    - name: Install .NET MAUI workloads
       run: |
-        dotnet workload install android
+        dotnet workload install maui-android
 
     - name: Build APK
       run: dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
