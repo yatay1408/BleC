@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -21,8 +21,40 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
-    - name: Install dependencies
-      run: dotnet restore Ble.Client/Ble.Client.sln
+    - name: Install Android SDK and Xamarin.Android
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+            openjdk-11-jdk \
+            unzip \
+            wget \
+            lib32stdc++6 \
+            lib32z1 \
+            libc6-i386 \
+            lib32gcc1 \
+            lib32ncurses5 \
+            lib32z1-dev \
+            build-essential
+
+        wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O commandlinetools.zip
+        mkdir -p $HOME/commandlinetools
+        unzip -q commandlinetools.zip -d $HOME/commandlinetools
+        mkdir -p $HOME/Android/Sdk
+        mv $HOME/commandlinetools/cmdline-tools $HOME/Android/Sdk/
+        yes | $HOME/Android/Sdk/cmdline-tools/bin/sdkmanager --licenses
+
+        $HOME/Android/Sdk/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "extras;google;m2repository" "extras;android;m2repository" "ndk-bundle"
+
+        echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
+        echo "PATH=$PATH:$HOME/Android/Sdk/platform-tools" >> $GITHUB_ENV
+        echo "PATH=$PATH:$HOME/Android/Sdk/cmdline-tools/bin" >> $GITHUB_ENV
+
+        dotnet tool install -g redth.net6.android.toolchain
+        dotnet tool update -g redth.net6.android.toolchain
+
+    - name: Install Xamarin.Android workload
+      run: |
+        dotnet workload install android
 
     - name: Build APK
       run: dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
