@@ -21,24 +21,23 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
-    - name: Install Visual Studio
-      uses: microsoft/setup-msbuild@v1.0.2
-
-    - name: Install Java SDK 11
+    - name: Install Visual Studio 2022 with .NET MAUI
       run: |
+        choco install visualstudio2022community --package-parameters "--add Microsoft.VisualStudio.Workload.NetCoreBuildTools --includeRecommended --includeOptional"
+        choco install visualstudio2022-workload-netmaui --package-parameters "--includeRecommended --includeOptional"
         choco install openjdk11
         refreshenv
 
     - name: Set up Java SDK 11
       run: |
         $javaHome = "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot"
-        echo "JAVA_HOME=$javaHome" >> $env:GITHUB_ENV
-        echo "PATH=$javaHome\\bin;$env:PATH" >> $env:GITHUB_ENV
+        echo "JAVA_HOME=$javaHome" >> $Env:GITHUB_ENV
+        echo "PATH=$javaHome\\bin;$Env:PATH" >> $Env:GITHUB_ENV
 
     - name: Verify Java SDK Installation
       run: |
         java -version
-        echo $JAVA_HOME
+        echo $Env:JAVA_HOME
 
     - name: Build Xamarin Android APK
       shell: pwsh
