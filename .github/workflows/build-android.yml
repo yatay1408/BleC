@@ -22,14 +22,15 @@ jobs:
         dotnet-version: '6.0.x'
 
     - name: Install Visual Studio
-      uses: microsoft/setup-msbuild@v1
-      with:
-        vs-version: 'latest'
-    
+      uses: microsoft/setup-msbuild@v1.0.2
+
     - name: Build Xamarin Android APK
+      shell: pwsh
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
-        msbuild /r /t:Restore,Build /p:Configuration=Release Ble.Client/Ble.Client.sln
+        $vsPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+        $msbuildPath = "$vsPath\MSBuild\Current\Bin\MSBuild.exe"
+        & $msbuildPath Ble.Client/Ble.Client.sln /t:Restore /p:Configuration=Release
+        & $msbuildPath Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj /t:PackageForAndroid /p:Configuration=Release
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
