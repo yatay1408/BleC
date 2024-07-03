@@ -24,8 +24,27 @@ jobs:
     - name: Install dependencies
       run: dotnet restore Ble.Client/Ble.Client.sln
 
-    - name: Build APK
-      run: dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
+    - name: Install Android SDK
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk
+        wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O commandlinetools.zip
+        unzip commandlinetools.zip -d $HOME/commandlinetools
+        mkdir -p $HOME/Android/Sdk/cmdline-tools
+        mv $HOME/commandlinetools/cmdline-tools $HOME/Android/Sdk/cmdline-tools/latest
+        yes | $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        $HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+
+    - name: Set up environment variables
+      run: |
+        echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
+        echo "PATH=$PATH:$HOME/Android/Sdk/platform-tools" >> $GITHUB_ENV
+        echo "PATH=$PATH:$HOME/Android/Sdk/cmdline-tools/latest/bin" >> $GITHUB_ENV
+
+    - name: Install Xamarin.Android
+      run: |
+        dotnet tool install -g redth.net6.xamarin.android
+        dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
