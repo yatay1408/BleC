@@ -65,9 +65,9 @@ jobs:
     - name: Find zipalign
       id: find-zipalign
       run: |
-        $zipalignPath = (Get-ChildItem -Recurse "C:\\Android\\android-sdk\\build-tools" -Filter "zipalign.exe").FullName
-        if ($zipalignPath) {
-          echo "zipalign=$zipalignPath" >> $Env:GITHUB_ENV
+        $zipalignPaths = Get-ChildItem -Recurse "C:\\Android\\android-sdk\\build-tools" -Filter "zipalign.exe" | Select-Object -First 1
+        if ($zipalignPaths) {
+          echo "zipalign=$($zipalignPaths.FullName)" >> $Env:GITHUB_ENV
         } else {
           Write-Error "zipalign not found"
         }
