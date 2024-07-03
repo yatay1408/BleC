@@ -62,11 +62,17 @@ jobs:
         $keyPassword = "password"
         & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\keytool.exe" -genkeypair -v -keystore $keystoreFile -storepass $keystorePassword -keypass $keyPassword -alias $keyAlias -dname "CN=Example, OU=Example, O=Example, L=City, ST=State, C=US" -keyalg RSA -keysize 2048 -validity 10000
 
+    - name: Find zipalign
+      id: find-zipalign
+      run: |
+        $zipalignPath = (Get-ChildItem -Recurse "C:\\Android\\android-sdk\\build-tools" -Filter "zipalign.exe").FullName
+        echo "zipalign=$zipalignPath" >> $Env:GITHUB_ENV
+
     - name: Sign APK
       run: |
         $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
         & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\jarsigner.exe" -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore -storepass password -keypass password $apkPath my-key-alias
-        & "C:\\Android\\android-sdk\\build-tools\\30.0.3\\zipalign.exe" -v 4 $apkPath $apkPath-signed.apk
+        & $Env:zipalign -v 4 $apkPath $apkPath-signed.apk
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
