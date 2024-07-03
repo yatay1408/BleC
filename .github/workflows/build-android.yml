@@ -80,6 +80,16 @@ jobs:
         & $Env:zipalign -v 4 $apkPath $alignedApkPath
         Move-Item -Path $alignedApkPath -Destination $apkPath -Force
 
+    - name: Verify APK Signature
+      run: |
+        $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
+        & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\apksigner.bat" verify --verbose $apkPath
+
+    - name: Verify APK Alignment
+      run: |
+        $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
+        & $Env:zipalign -c -v 4 $apkPath
+
     - name: Publish APK
       uses: actions/upload-artifact@v4
       with:
