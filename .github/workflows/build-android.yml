@@ -1,0 +1,34 @@
+name: Build Xamarin Android APK
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'  # Thay đổi nếu cần thiết
+
+    - name: Install dependencies
+      run: dotnet restore Ble.Client/Ble.Client.sln
+
+    - name: Build APK
+      run: dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
+
+    - name: Publish APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: XamarinAndroidApp
+        path: '**/*.apk'
