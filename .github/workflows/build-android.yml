@@ -62,7 +62,7 @@ jobs:
         $keyPassword = "password"
         & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\keytool.exe" -genkeypair -v -keystore $keystoreFile -storepass $keystorePassword -keypass $keyPassword -alias $keyAlias -dname "CN=Example, OU=Example, O=Example, L=City, ST=State, C=US" -keyalg RSA -keysize 2048 -validity 10000
         $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
-        & "C:\\Android\\android-sdk\\build-tools\\30.0.3\\apksigner.bat" sign --ks $keystoreFile --ks-pass pass:$keystorePassword --key-pass pass:$keyPassword --out $apkPath-signed.apk $apkPath
+        & "java" -jar "C:\\Android\\android-sdk\\build-tools\\30.0.3\\lib\\apksigner.jar" sign --ks $keystoreFile --ks-pass pass:$keystorePassword --key-pass pass:$keyPassword --out $apkPath-signed.apk $apkPath
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
