@@ -26,6 +26,7 @@ jobs:
         choco install visualstudio2022community --package-parameters "--add Microsoft.VisualStudio.Workload.NetCoreBuildTools --includeRecommended --includeOptional"
         choco install visualstudio2022-workload-netmaui --package-parameters "--includeRecommended --includeOptional"
         choco install openjdk11
+        Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
         refreshenv
 
     - name: Set up Java SDK 11
