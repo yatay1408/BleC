@@ -41,10 +41,12 @@ jobs:
         echo "PATH=$PATH:$HOME/Android/Sdk/platform-tools" >> $GITHUB_ENV
         echo "PATH=$PATH:$HOME/Android/Sdk/cmdline-tools/latest/bin" >> $GITHUB_ENV
 
-    - name: Install Xamarin.Android
+    - name: Install Xamarin.Android workload
       run: |
-        dotnet tool install -g redth.net6.xamarin.android
-        dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
+        dotnet workload install android
+
+    - name: Build APK
+      run: dotnet build Ble.Client/Ble.Client.Android/Ble.Client.Android.csproj --configuration Release
 
     - name: Publish APK
       uses: actions/upload-artifact@v2
