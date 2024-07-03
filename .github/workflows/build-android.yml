@@ -76,8 +76,9 @@ jobs:
       run: |
         $apkPath = (Get-ChildItem -Path Ble.Client/Ble.Client.Android/bin/Release -Filter *.apk -Recurse).FullName
         & "C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot\\bin\\jarsigner.exe" -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore my-release-key.keystore -storepass password -keypass password $apkPath my-key-alias
-        & $Env:zipalign -v 4 $apkPath $apkPath-aligned.apk
-        Move-Item -Path $apkPath-aligned.apk -Destination $apkPath -Force
+        $alignedApkPath = "$($apkPath -replace '.apk$', '-aligned.apk')"
+        & $Env:zipalign -v 4 $apkPath $alignedApkPath
+        Move-Item -Path $alignedApkPath -Destination $apkPath -Force
 
     - name: Publish APK
       uses: actions/upload-artifact@v4
